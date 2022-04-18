@@ -2,6 +2,7 @@ pub mod synacor_vm;
 pub mod twisty_passages;
 pub mod strange_monument;
 pub mod interdimensional_physics;
+pub mod orb_vault;
 
 use std::env;
 use std::process;
@@ -63,6 +64,7 @@ fn main() {
 	for argument in env::args() {
 		println!("{}", argument);
 	}
+	
 	// load the binary;
 	let bin_path = env::args().nth(1).unwrap();
 	let binary = read_bin(&bin_path);
@@ -118,14 +120,19 @@ fn main() {
 		println!("Unable to solve the secrets of the universe...")
 	}
 	println!("The secrets of the universe have been illuminated. The teleporter destination has been reached.");
-
+	println!("Resuming automatic traversal...");
+	play_to_vault(&mut vm);
+	println!("Automatic traversal has reached the vault antechamber.");
+	if !orb_vault::solve(&mut vm) {
+		println!("Like the expedition before you, the mystery of the vault escapes your grasp.")
+	}
 	println!("Resuming interactive mode...");
 	vm.set_interactive(true);	
 	loop {
 		vm.execute();
 	}	
 }
-fn play_to_twisty_passages(vm:&mut synacor_vm::SynacorVM ) {
+fn play_to_twisty_passages(vm:&mut synacor_vm::SynacorVM) {
 	println!("Taking tablet...");
 	vm.input_line("take tablet");
 	let _ = vm.output_line(true);
@@ -195,4 +202,20 @@ fn play_to_synacor_hq(vm: &mut synacor_vm::SynacorVM) {
 	vm.input_line("take business card");
 	println!("Taking the strange book...");
 	vm.input_line("take strange book");
+}
+
+fn play_to_vault(vm:&mut synacor_vm::SynacorVM) {
+	vm.input_line("go north");
+	vm.input_line("go north");
+	vm.input_line("go north");
+	vm.input_line("go north");
+	vm.input_line("go north");
+	vm.input_line("go north");
+	vm.input_line("go north");
+	vm.input_line("go east");
+	println!("Taking the journal...");
+	vm.input_line("take journal");
+	vm.input_line("go west");
+	vm.input_line("go north");
+	vm.input_line("go north");
 }
