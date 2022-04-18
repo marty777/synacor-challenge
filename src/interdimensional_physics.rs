@@ -130,7 +130,7 @@ pub fn decompile(program:&Vec<u16>) -> Vec<String> {
 				},
 			_ => {
 					lines.push(format!("DATA? {} \t\t\t#{}", program[index], index));
-					// no guarantee we pick up in the write alignment
+					// no guarantee we pick up in the right alignment
 					index += 1;
 				}
 		}

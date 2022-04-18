@@ -123,11 +123,8 @@ fn main() {
 	vm.set_interactive(true);	
 	loop {
 		vm.execute();
-	}
-	
-	
+	}	
 }
-
 fn play_to_twisty_passages(vm:&mut synacor_vm::SynacorVM ) {
 	println!("Taking tablet...");
 	vm.input_line("take tablet");
@@ -150,8 +147,6 @@ fn play_to_twisty_passages(vm:&mut synacor_vm::SynacorVM ) {
 	vm.input_line("go passage");
 	vm.input_line("go ladder");
 }
-
-
 fn play_to_strange_monument(vm: &mut synacor_vm::SynacorVM) {
 	vm.input_line("go west");
 	vm.input_line("go ladder");
@@ -186,10 +181,7 @@ fn play_to_strange_monument(vm: &mut synacor_vm::SynacorVM) {
 	vm.input_line("go down");
 	vm.input_line("go east");
 	let _ = vm.output_line(true);
-	//vm.input_line("look");
-	//println!("{}",vm.output_line(true));
 }
-
 fn play_to_synacor_hq(vm: &mut synacor_vm::SynacorVM) {
 	vm.input_line("go north");
 	println!("Taking the teleporter...");
