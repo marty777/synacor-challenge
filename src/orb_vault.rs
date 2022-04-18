@@ -227,7 +227,6 @@ fn recurse(map: &OrbVaultMap, route: &Vec<char>, desired_result:i32, max_steps:u
 	}
 	return (false,Vec::new());
 }
-
 fn try_route(vm:&mut super::synacor_vm::SynacorVM, route:&Vec<char>) {
 	vm.input_line("take orb");
 	for c in route {
@@ -238,13 +237,12 @@ fn try_route(vm:&mut super::synacor_vm::SynacorVM, route:&Vec<char>) {
 			'w' => vm.input_line("go west"),
 			_ => {
 					println!("Unknown direction {}", c); 
-					break; 
+					return; 
 				}
 		}
 	}
 	vm.input_line("go vault");
 }
-
 fn reverse(code:&String) -> String {
 	let code_chars:Vec<char> = code.chars().collect();
 	let mut result_chars:Vec<char> = Vec::new();
@@ -263,7 +261,6 @@ fn reverse(code:&String) -> String {
 	}
 	return result_chars.into_iter().collect();
 }
-
 fn mirror_code(mirror_use:&String) -> String {
 	// dumb way to extract the code string - split on double quote
 	let code_split:Vec<&str> = mirror_use.split(34 as char).collect();
@@ -272,7 +269,6 @@ fn mirror_code(mirror_use:&String) -> String {
 	}
 	return reverse(&code_split[1].to_string());
 }
-
 // requires a vm placed at the orb position in the vault antechamber
 pub fn solve(vm:&mut super::synacor_vm::SynacorVM) -> bool {
 	println!("Exploring the rooms around the vault...");
@@ -291,7 +287,6 @@ pub fn solve(vm:&mut super::synacor_vm::SynacorVM) -> bool {
 		vm.input_line("go vault");
 		vm.input_line("take mirror");
 		// clear output
-		vm.input_line("take mirror");
 		let _ = vm.output_line(true);
 		vm.input_line("use mirror");
 		let use_mirror = vm.output_line(true);
