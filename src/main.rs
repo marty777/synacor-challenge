@@ -4,24 +4,25 @@ pub mod strange_monument;
 pub mod interdimensional_physics;
 pub mod orb_vault;
 
-use std::env;
+use clap::{Arg, Command};
 use std::process;
 use std::io::prelude::*;
 use std::fs;
 use std::fs::File;
 use std::io::Write;
 
+
 fn read_bin(path:&String) -> Vec<u16>
 {
 	let file_result = File::open(&path);
 	if !file_result.is_ok() {
 		println!("Unable to open file at path {}", path);
-		usage();
+		process::exit(0);
 	}
 	let metadata_result = fs::metadata(&path);
 	if !metadata_result.is_ok() {
 		println!("Unable to read metadata for file at path {}", path);
-		usage();
+		process::exit(0);
 	}
 	let mut file = file_result.unwrap();
 	let metadata = metadata_result.unwrap();
@@ -29,7 +30,7 @@ fn read_bin(path:&String) -> Vec<u16>
 	let file_read_result = file.read(&mut buff);
 	if !file_read_result.is_ok() {
 		println!("An error occurred while reading the file at path {}: {}", path, file_read_result.unwrap_err());
-		usage();
+		process::exit(0);
 	}
 	let mut buff2:Vec<u16> = vec![0; ((metadata.len()/2) + 1) as usize];
 	let mut index = 0;
@@ -48,33 +49,41 @@ fn read_bin(path:&String) -> Vec<u16>
 	return buff2;
 }
 
-fn usage() {
-	println!("Usage:\tcargo run <binary_file_path>");
-	println!("\tbinary_file_path:\tpath to input binary file");
-	process::exit(0);
-}
-
 fn main() {
 	// don't forget to examine the arch-spec file for challenge code #1
-	let dump_decompile:bool = false;
-	// get path to binary from args
-	if env::args().len() < 2 {
-		usage();
-	}
-	for argument in env::args() {
-		println!("{}", argument);
-	}
 	
-	// load the binary;
-	let bin_path = env::args().nth(1).unwrap();
+	let args = Command::new("synacor-challenge")
+					.arg(Arg::new("INPUT").help("Your challenge.bin file").required(true).index(1))
+					.arg(Arg::new("interactive").help("Disables autosolving and runs the challenge binary in interactive terminal mode.").short('i'))
+					.arg(Arg::new("dump").help("Export a decompiled version of the challenge binary to text file").short('d').value_name("FILE").takes_value(true))
+					.get_matches();
+					
+	
+	// read the binary
+	let bin_path = args.value_of_t("INPUT").unwrap_or_else(|e| e.exit());
 	let binary = read_bin(&bin_path);
-	if dump_decompile {
+	
+	// optional: decompile and dump the binary then exit
+	if args.is_present("dump") {
+		let dump_path:&str = args.value_of("dump").unwrap();
+		println!("Exporting decompiled binary to {}", dump_path);
 		let decompiled = interdimensional_physics::decompile(&binary);
-		let mut file = File::create("decompiled.txt").unwrap();
+		let mut file = File::create(dump_path).unwrap();
 		for i in 0..decompiled.len() {
 			writeln!(&mut file, "{}", decompiled[i]).unwrap();
 		}
+		process::exit(0);
 	}
+	
+	// optional: run in interactive mode
+	let interactive:bool;
+	if args.is_present("interactive") {
+		interactive = true;
+	}
+	else {
+		interactive = false;
+	}
+	
 	// initialize vm and load binary into memory
 	let mut vm:synacor_vm::SynacorVM = synacor_vm::SynacorVM::new(false);
 	let load_mem_result = vm.load_mem(binary);
@@ -85,6 +94,16 @@ fn main() {
 	vm.execute();
 	// the output of startup and the self test yields challenge codes #2 and #3
 	println!("{}",vm.output_line(true));
+	
+	if interactive {
+		vm.set_interactive(true);	
+		loop {
+			vm.execute();
+			if vm.is_halted() {
+				process::exit(0);
+			}
+		}
+	}
 	
 	println!("Suspending interactive mode. Beginning automatic traversal.");
 	// challenge code #4 appears here when taking and using the tablet
@@ -130,6 +149,9 @@ fn main() {
 	vm.set_interactive(true);	
 	loop {
 		vm.execute();
+		if vm.is_halted() {
+			process::exit(0);
+		}
 	}	
 }
 fn play_to_twisty_passages(vm:&mut synacor_vm::SynacorVM) {

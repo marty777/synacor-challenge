@@ -12,8 +12,6 @@ struct TwistyPassagesNode {
 	id:u16,
 	links:Vec<TwistyPassagesLink>,
 	items: Vec<String>,
-	look:String,
-	halts:bool,
 	path:Vec<String>,
 }
 
@@ -65,10 +63,9 @@ fn parse_node(vm: &super::synacor_vm::SynacorVM, path:Vec<String>) -> TwistyPass
 	let look = vm_clone.output_line(true);
 	let lines:Vec<&str> = look.split(10 as char).collect();
 	let id = vm_clone.get_mem(2733).unwrap();
-	let halts = vm_clone.is_halted();
 	
 	
-	let mut node = TwistyPassagesNode { id: id, links:Vec::new(), items:Vec::new(), look:look.clone(), halts:halts, path:path.clone()};
+	let mut node = TwistyPassagesNode { id: id, links:Vec::new(), items:Vec::new(), path:path.clone()};
 	let mut at_items:bool = false;
 	let mut at_exits:bool = false;
 	for i in 0..lines.len() {
@@ -121,7 +118,7 @@ pub fn solve(vm:&mut super::synacor_vm::SynacorVM) -> bool {
 		frontier_next.clear();
 		
 		for i in 0..frontier.len() {
-			let node = nodes.get(&frontier[i]).unwrap().clone();
+			let node = nodes.get_mut(&frontier[i]).unwrap().clone();
 			for j in 0..node.links.len() {
 				if !node.links[j].explored {
 					let mut path = node.path.clone();

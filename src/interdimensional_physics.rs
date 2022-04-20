@@ -19,118 +19,128 @@ fn decompiler_val(program:&Vec<u16>, index:usize) -> String {
 		return format!("INVALID {}", val);
 	}
 }
-// this could stand to have the tab columns cleaned up and it's not
-// very useful once it gets out of the instruction section of memory.
-// perfectly fine for manual inspection to puzzle out the teleporter 
-// check though.
+
+fn append_with_tabs(input:String, tab_pos:usize, append:String) -> String {
+	let tab_len = 4;
+	if tab_len * tab_pos < input.len() {
+		return format!("{}\t{}", input, append);
+	}
+	let mut result = input.clone();
+	let mut pos = result.len();
+	while pos < tab_pos * tab_len {
+		result.push_str("\t");
+		pos += tab_len;
+	}
+	return format!("{}{}", result, append);
+}
 pub fn decompile(program:&Vec<u16>) -> Vec<String> {
 	let mut index = 0;
 	let mut lines:Vec<String> = Vec::new();
+	let tab_pos = 6;
 	while index < program.len() {
 		match program[index] {
 			0 => {
-					lines.push(format!("HALT \t\t\t\t\t#{}", index));
+					lines.push(append_with_tabs(format!("HALT"), tab_pos, format!("#{}", index)));
 					index += 1;
 				},
 			1 => {
-					lines.push(format!("SET {} {} \t\t\t\t#{}", decompiler_val(program, index + 1), decompiler_val(program, index + 2), index));
+					lines.push(append_with_tabs(format!("SET {} {}", decompiler_val(program, index + 1), decompiler_val(program, index + 2)), tab_pos, format!("#{}", index)));
 					index += 3;
 				},
 			2 => {
-					lines.push(format!("PUSH {} \t\t\t\t#{}", decompiler_val(program, index + 1), index));
+					lines.push(append_with_tabs(format!("PUSH {}", decompiler_val(program, index + 1)), tab_pos, format!("#{}", index)));
 					index += 2;
 				},
 			3 => {
-					lines.push(format!("POP {} \t\t\t\t#{}", decompiler_val(program, index + 1), index));
+					lines.push(append_with_tabs(format!("POP {}", decompiler_val(program, index + 1)), tab_pos, format!("#{}", index)));
 					index += 2;
 				},
 			4 => {
-					lines.push(format!("EQ {} {} {} \t\t#{}", decompiler_val(program, index + 1), decompiler_val(program, index + 2), decompiler_val(program, index + 3), index));
+					lines.push(append_with_tabs(format!("EQ {} {} {}", decompiler_val(program, index + 1), decompiler_val(program, index + 2), decompiler_val(program, index + 3)), tab_pos, format!("#{}", index)));
 					index += 4;
 				},
 			5 => {
-					lines.push(format!("GT {} {} {} \t\t#{}", decompiler_val(program, index + 1), decompiler_val(program, index + 2), decompiler_val(program, index + 3), index));
+					lines.push(append_with_tabs(format!("GT {} {} {}", decompiler_val(program, index + 1), decompiler_val(program, index + 2), decompiler_val(program, index + 3)), tab_pos, format!("#{}", index)));
 					index += 4;
 				},
 			6 => {
-					lines.push(format!("JMP {} \t\t\t\t#{}", decompiler_val(program, index + 1), index));
+					lines.push(append_with_tabs(format!("JMP {}", decompiler_val(program, index + 1)), tab_pos, format!("#{}", index)));
 					index += 2;
 				},
 			7 => {
-					lines.push(format!("JT {} {} \t\t\t#{}", decompiler_val(program, index + 1), decompiler_val(program, index + 2), index));
+					lines.push(append_with_tabs(format!("JT {} {}", decompiler_val(program, index + 1), decompiler_val(program, index + 2)), tab_pos, format!("#{}", index)));
 					index += 3;
 				},
 			8 => {
-					lines.push(format!("JF {} {} \t\t\t#{}", decompiler_val(program, index + 1), decompiler_val(program, index + 2), index));
+					lines.push(append_with_tabs(format!("JF {} {}", decompiler_val(program, index + 1), decompiler_val(program, index + 2)), tab_pos, format!("#{}", index)));
 					index += 3;
 				},
 			9 => {
-					lines.push(format!("ADD {} {} {} \t\t\t#{}", decompiler_val(program, index + 1), decompiler_val(program, index + 2), decompiler_val(program, index + 3), index));
+					lines.push(append_with_tabs(format!("ADD {} {} {}", decompiler_val(program, index + 1), decompiler_val(program, index + 2), decompiler_val(program, index + 3)), tab_pos, format!("#{}", index)));
 					index += 4;
 				},
 			10 => {
-					lines.push(format!("MULT {} {} {} \t\t\t#{}", decompiler_val(program, index + 1), decompiler_val(program, index + 2), decompiler_val(program, index + 3), index));
+					lines.push(append_with_tabs(format!("MULT {} {} {}", decompiler_val(program, index + 1), decompiler_val(program, index + 2), decompiler_val(program, index + 3)), tab_pos, format!("#{}", index)));
 					index += 4;
 				},
 			11 => {
-					lines.push(format!("MOD {} {} {} \t\t\t#{}", decompiler_val(program, index + 1), decompiler_val(program, index + 2), decompiler_val(program, index + 3), index));
+					lines.push(append_with_tabs(format!("MOD {} {} {}", decompiler_val(program, index + 1), decompiler_val(program, index + 2), decompiler_val(program, index + 3)), tab_pos, format!("#{}", index)));
 					index += 4;
 				},
 			12 => {
-					lines.push(format!("AND {} {} {} \t\t#{}", decompiler_val(program, index + 1), decompiler_val(program, index + 2), decompiler_val(program, index + 3), index));
+					lines.push(append_with_tabs(format!("AND {} {} {}", decompiler_val(program, index + 1), decompiler_val(program, index + 2), decompiler_val(program, index + 3)), tab_pos, format!("#{}", index)));
 					index += 4;
 				},
 			13 => {
-					lines.push(format!("OR {} {} {} \t\t#{}", decompiler_val(program, index + 1), decompiler_val(program, index + 2), decompiler_val(program, index + 3), index));
+					lines.push(append_with_tabs(format!("OR {} {} {}", decompiler_val(program, index + 1), decompiler_val(program, index + 2), decompiler_val(program, index + 3)), tab_pos, format!("#{}", index)));
 					index += 4;
 				},
 			14 => {
-					lines.push(format!("NOT {} {} \t\t\t\t#{}", decompiler_val(program, index + 1), decompiler_val(program, index + 2), index));
+					lines.push(append_with_tabs(format!("NOT {} {}", decompiler_val(program, index + 1), decompiler_val(program, index + 2)), tab_pos, format!("#{}", index)));
 					index += 3;
 				},
 			15 => {
-					lines.push(format!("RMEM {} {} \t\t\t\t#{}", decompiler_val(program, index + 1), decompiler_val(program, index + 2), index));
+					lines.push(append_with_tabs(format!("RMEM {} {}", decompiler_val(program, index + 1), decompiler_val(program, index + 2)), tab_pos, format!("#{}", index)));					
 					index += 3;
 				},
 			16 => {
-					lines.push(format!("WMEM {} {} \t\t\t\t#{}", decompiler_val(program, index + 1), decompiler_val(program, index + 2), index));
+					lines.push(append_with_tabs(format!("WMEM {} {}", decompiler_val(program, index + 1), decompiler_val(program, index + 2)), tab_pos, format!("#{}", index)));					
 					index += 3;
 				},
 			17 => {
-					lines.push(format!("CALL {} \t\t\t\t#{}", decompiler_val(program, index + 1), index));
+					lines.push(append_with_tabs(format!("CALL {}", decompiler_val(program, index + 1)), tab_pos, format!("#{}", index)));
 					index += 2;
 				},
 			18 => {
-					lines.push(format!("RET \t\t\t\t#{}", index));
+					lines.push(append_with_tabs(format!("RET"), tab_pos, format!("#{}", index)));
 					index += 1;
 				},
 			19 =>  {
 					let val = program[index+1];
 					if val <= 255 {
 						if val == 10 {
-							lines.push(format!("OUT {}\t(LF) \t\t\t#{}", decompiler_val(program, index + 1), index));
+							lines.push(append_with_tabs(format!("OUT {}\t(LF)", decompiler_val(program, index + 1)), tab_pos - 1, format!("#{}", index)));		
 						}
 						else {
-							lines.push(format!("OUT {}\t({}) \t\t\t#{}", decompiler_val(program, index + 1), val as u8 as char, index));
+							lines.push(append_with_tabs(format!("OUT {}\t({})", decompiler_val(program, index + 1), val as u8 as char), tab_pos, format!("#{}", index)));
 						}
 						
 					}
 					else {
-						lines.push(format!("OUT {} \t\t\t\t#{}", decompiler_val(program, index + 1), index));
+						lines.push(append_with_tabs(format!("OUT {}", decompiler_val(program, index + 1)), tab_pos, format!("#{}", index)));
 					}
 					index += 2;
 				},
 			20 =>  {
-					lines.push(format!("IN {} \t\t\t\t#{}", decompiler_val(program, index + 1), index));
+					lines.push(append_with_tabs(format!("IN {}", decompiler_val(program, index + 1)), tab_pos, format!("#{}", index)));
 					index += 2;
 				},
 			21 => {
-					lines.push(format!("NOOP \t\t\t\t\t#{}", index));
+					lines.push(append_with_tabs(format!("NOOP"), tab_pos, format!("#{}", index)));
 					index += 1;
 				},
 			_ => {
-					lines.push(format!("DATA? {} \t\t\t#{}", program[index], index));
-					// no guarantee we pick up in the right alignment
+					lines.push(append_with_tabs(format!("DATA? {}", program[index]), tab_pos, format!("#{}", index)));
 					index += 1;
 				}
 		}
