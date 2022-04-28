@@ -56,8 +56,8 @@ fn main() {
 					.arg(Arg::new("INPUT").help("Your challenge.bin file").required(true).index(1))
 					.arg(Arg::new("interactive").help("Disables autosolving and runs the challenge binary in interactive terminal mode.").short('i'))
 					.arg(Arg::new("dump").help("Export a decompiled version of the challenge binary to text file").short('d').value_name("FILE").takes_value(true))
+					.arg(Arg::new("teleportersearch").help("Enables the search for a teleporter setting rather than using a precomputed solution.").short('t').value_name("SEARCH_TYPE").possible_values(["single", "parallel"]))
 					.get_matches();
-					
 	
 	// read the binary
 	let bin_path = args.value_of_t("INPUT").unwrap_or_else(|e| e.exit());
@@ -82,6 +82,23 @@ fn main() {
 	}
 	else {
 		interactive = false;
+	}
+	
+	// optional: enable teleporter r7 search
+	let teleporter_search:bool;
+	let teleporter_search_parallel:bool;
+	if args.is_present("teleportersearch") {
+		teleporter_search = true;
+		if args.value_of("teleportersearch").unwrap() == "single" {
+			teleporter_search_parallel = false;
+		}
+		else {
+			teleporter_search_parallel = true;
+		}
+	}
+	else {
+		teleporter_search = false;
+		teleporter_search_parallel = false;
 	}
 	
 	// initialize vm and load binary into memory
@@ -135,7 +152,7 @@ fn main() {
 	println!("Automatic traversal has reached Synacor Headquarters.");
 	println!("Delving into the secrets of the universe...");
 	// activating the teleporter correctly to reach the second destination yields challenge code #7
-	if !interdimensional_physics::physics_analysis(&mut vm) {
+	if !interdimensional_physics::physics_analysis(&mut vm, teleporter_search, teleporter_search_parallel) {
 		println!("Unable to solve the secrets of the universe...")
 	}
 	println!("The secrets of the universe have been illuminated. The teleporter destination has been reached.");

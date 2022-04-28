@@ -17,8 +17,7 @@ struct TwistyPassagesNode {
 
 // requires a vm at the ladder position
 fn explore_link(vm: &super::synacor_vm::SynacorVM, path:Vec<String>, nodes:&mut HashMap<u16, TwistyPassagesNode>, parent:u16) -> u16 {
-	let path_clone = path.clone();
-	let node = parse_node(vm, path_clone);
+	let node = parse_node(vm, path.clone());
 	let node_id = node.id;
 	if nodes.contains_key(&node_id) {
 		// shorten the path if possible
@@ -50,9 +49,7 @@ fn explore_link(vm: &super::synacor_vm::SynacorVM, path:Vec<String>, nodes:&mut 
 }
 // requires a vm at the ladder position
 fn parse_node(vm: &super::synacor_vm::SynacorVM, path:Vec<String>) -> TwistyPassagesNode {
-	// by manual inspection, it looks like the current node id is set at 
-	// memory address 2733
-	
+	// by manual inspection, it looks like the current node id is set at memory address 2733
 	let mut vm_clone = vm.clone();
 	for i in 0..path.len() {
 		vm_clone.input_line_string(format!("go {}\n", path[i]));
@@ -63,7 +60,6 @@ fn parse_node(vm: &super::synacor_vm::SynacorVM, path:Vec<String>) -> TwistyPass
 	let look = vm_clone.output_line(true);
 	let lines:Vec<&str> = look.split(10 as char).collect();
 	let id = vm_clone.get_mem(2733).unwrap();
-	
 	
 	let mut node = TwistyPassagesNode { id: id, links:Vec::new(), items:Vec::new(), path:path.clone()};
 	let mut at_items:bool = false;
@@ -92,7 +88,6 @@ fn parse_node(vm: &super::synacor_vm::SynacorVM, path:Vec<String>) -> TwistyPass
 			node.links.push(TwistyPassagesLink { name:lines[i][2..].to_string(), id:0, explored:false });
 		}
 	}
-	
 	return node;
 }
 // requires a vm in non-interactive mode that has been placed 
